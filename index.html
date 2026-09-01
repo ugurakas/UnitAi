@@ -3,82 +3,597 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>UnitAI</title>
+<title>UnitAI — Local AI for embedded and IoT systems</title>
+<meta name="description" content="UnitAI orchestrates specialized local SLMs to work like a full embedded systems engineer — hardware, firmware, debugging, vision, and documentation, running entirely on-device.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#0b0d12;color:#f4f6fa}
-.wrap{max-width:1100px;margin:auto;padding:0 24px}
-nav{display:flex;justify-content:space-between;align-items:center;padding:24px 0}
-.logo{font-size:28px;font-weight:800}.logo span{color:#ff7a00}
-.hero{padding:100px 0 80px;display:grid;grid-template-columns:1.2fr .8fr;gap:50px;align-items:center}
-h1{font-size:64px;line-height:1.02;margin:0 0 24px}
-p{color:#aeb7c6;line-height:1.7;font-size:18px}
-.badge{color:#ff7a00;font-weight:700;letter-spacing:2px;font-size:12px}
-.box{background:#111722;border:1px solid #283142;border-radius:18px;padding:28px;font-family:monospace;line-height:1.8}
-.green{color:#7ee787}.orange{color:#ff7a00}
-.btns{display:flex;gap:12px;margin-top:28px}
-a.btn{padding:12px 18px;border-radius:9px;border:1px solid #30394a;color:#fff;text-decoration:none;font-weight:700}
-a.primary{background:#ff7a00;color:#111;border-color:#ff7a00}
-section{padding:70px 0;border-top:1px solid #1b2230}
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.card{background:#111722;border:1px solid #283142;border-radius:14px;padding:22px}
-.card h3{margin:10px 0}.card p{font-size:14px}
-.tags{display:flex;flex-wrap:wrap;gap:10px}.tags span{background:#111722;border:1px solid #283142;border-radius:99px;padding:9px 13px;color:#cbd3df}
-footer{padding:30px 0;color:#737f91;border-top:1px solid #1b2230}
-@media(max-width:800px){.hero{grid-template-columns:1fr}h1{font-size:46px}.cards{grid-template-columns:1fr 1fr}}
-@media(max-width:520px){.cards{grid-template-columns:1fr}}
+  :root{
+    --bg:#0a0e14;
+    --surface:#10161f;
+    --line:#1e2a38;
+    --line-soft:#161f2a;
+    --text:#e9eef3;
+    --text-dim:#8a96a6;
+    --text-faint:#5b6675;
+    --accent:#e2a23f;
+    --accent-soft:#e2a23f26;
+    --signal:#4fd1c5;
+    --signal-soft:#4fd1c526;
+    --max:1080px;
+    --section-py:92px;
+    --font-display:'Space Grotesk',sans-serif;
+    --font-body:'IBM Plex Sans',sans-serif;
+    --font-mono:'IBM Plex Mono',monospace;
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+
+  body{
+    margin:0;
+    background:var(--bg);
+    background-image:radial-gradient(rgba(233,238,243,0.035) 1px,transparent 1px);
+    background-size:26px 26px;
+    color:var(--text);
+    font-family:var(--font-body);
+    font-size:17px;
+    line-height:1.65;
+    overflow-x:hidden;
+  }
+
+  a{color:inherit}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 28px}
+
+  /* ---------- scroll reveal ---------- */
+
+  .reveal{
+    opacity:0;
+    transform:translateY(52px) rotate(-3deg) scale(.93);
+    transition:opacity .9s cubic-bezier(.16,.84,.32,1),
+               transform .9s cubic-bezier(.16,.84,.32,1);
+    will-change:transform,opacity;
+  }
+  .reveal:nth-child(even){transform:translateY(52px) rotate(3deg) scale(.93)}
+  .reveal.is-visible{opacity:1;transform:none}
+
+  .reveal-row:nth-of-type(1){transition-delay:0ms}
+  .reveal-row:nth-of-type(2){transition-delay:80ms}
+  .reveal-row:nth-of-type(3){transition-delay:160ms}
+  .reveal-row:nth-of-type(4){transition-delay:240ms}
+  .reveal-row:nth-of-type(5){transition-delay:320ms}
+  .reveal-row:nth-of-type(6){transition-delay:400ms}
+
+  @media (prefers-reduced-motion:reduce){
+    .reveal{opacity:1!important;transform:none!important;transition:none!important}
+    .sch-trace-live,.sch-trace-live2{animation:none!important;stroke-dashoffset:0!important}
+    .sch-via-live{animation:none!important;opacity:1!important}
+  }
+
+  /* ---------- nav ---------- */
+
+  nav.top{display:flex;justify-content:space-between;align-items:center;padding:30px 0}
+  .logo{font-family:var(--font-display);font-size:22px;font-weight:700;letter-spacing:-0.01em}
+  .logo em{color:var(--accent);font-style:normal}
+  .navlinks{display:flex;gap:24px;font-size:15px}
+  .navlinks a{text-decoration:none;color:var(--text-dim);transition:color .15s ease;border-bottom:1px solid transparent;padding-bottom:2px}
+  .navlinks a:hover{color:var(--text);border-bottom-color:var(--line)}
+
+  /* ---------- hero ---------- */
+
+  .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:start;padding:52px 0 56px}
+  .hero-illustration{max-width:340px;margin:0 auto;display:block}
+  .hero h1{font-family:var(--font-display);font-weight:600;font-size:clamp(34px,4.8vw,56px);line-height:1.1;letter-spacing:-0.015em;margin:0 0 22px}
+  .hero p.lede{color:var(--text-dim);font-size:18px;max-width:54ch;margin:0 0 34px}
+  .cta-row{display:flex;gap:12px;flex-wrap:wrap}
+
+  .btn{display:inline-block;padding:12px 20px;border-radius:6px;font-family:var(--font-body);font-weight:500;font-size:15px;text-decoration:none;border:1px solid var(--line);transition:background .15s ease,border-color .15s ease}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#0a0e14;font-weight:600}
+  .btn.primary:hover{background:#eeb35a}
+  .btn.ghost{color:var(--text)}
+  .btn.ghost:hover{border-color:var(--text-dim)}
+
+  /* ---------- stats strip ---------- */
+
+  .stats{border-top:1px solid var(--line-soft);padding:36px 0}
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+  .stat .num{font-family:var(--font-display);font-weight:600;font-size:clamp(26px,3.2vw,38px);color:var(--accent);line-height:1}
+  .stat .label{font-family:var(--font-mono);font-size:12.5px;color:var(--text-dim);margin-top:8px;line-height:1.5;max-width:22ch}
+
+  /* ---------- schematics (shared) ---------- */
+
+  .schematic{width:100%;height:auto;overflow:visible}
+  .sch-chip-rect{fill:var(--surface);stroke:var(--line);stroke-width:1.4}
+  .sch-chip-rect.hi{stroke:var(--accent-soft)}
+  .sch-label{font-family:var(--font-mono);font-size:11px;fill:var(--text-dim);letter-spacing:.02em}
+  .sch-sublabel{font-family:var(--font-mono);font-size:9px;fill:var(--text-faint)}
+  .sch-trace{fill:none;stroke:var(--line);stroke-width:1.6}
+  .sch-via{fill:var(--line)}
+
+  .sch-trace-live{fill:none;stroke:var(--accent);stroke-width:1.8;stroke-dasharray:210;stroke-dashoffset:210;animation:draw 1.4s .3s ease-out forwards}
+  .sch-via-live{fill:var(--accent);opacity:0;animation:appear .3s 1.5s ease-out forwards}
+
+  .sch-trace-live2{fill:none;stroke:var(--signal);stroke-width:1.8;stroke-dasharray:80;stroke-dashoffset:80}
+  .reveal.is-visible .sch-trace-live2{animation:draw2 .8s .5s ease-out forwards}
+
+  @keyframes draw{to{stroke-dashoffset:0}}
+  @keyframes draw2{to{stroke-dashoffset:0}}
+  @keyframes appear{to{opacity:1}}
+
+  /* ---------- sections ---------- */
+
+  section{border-top:1px solid var(--line-soft);padding:var(--section-py) 0}
+
+  .section-head{display:grid;grid-template-columns:200px 1fr;gap:40px;margin-bottom:20px}
+  .section-tag{font-family:var(--font-mono);font-size:13px;color:var(--text-faint);padding-top:6px}
+  .section-head h2{font-family:var(--font-display);font-weight:600;font-size:clamp(26px,3.2vw,34px);line-height:1.2;letter-spacing:-0.01em;margin:0;max-width:22ch}
+
+  .section-body{display:grid;grid-template-columns:200px 1fr;gap:40px;margin-bottom:44px}
+  .section-body > .spacer{display:block}
+  .section-body p{color:var(--text-dim);max-width:66ch;margin:0}
+
+  /* ---------- generic two-col rows (spec / role / step / capability) ---------- */
+
+  .row-list{border-top:1px solid var(--line-soft)}
+  .row-item{display:grid;grid-template-columns:220px 1fr;gap:32px;padding:24px 0;border-bottom:1px solid var(--line-soft)}
+  .row-item h3{font-family:var(--font-body);font-weight:600;font-size:17px;margin:0;color:var(--text)}
+  .row-item p{margin:0;color:var(--text-dim);font-size:16px;max-width:64ch}
+  .row-item .tag{font-family:var(--font-mono);font-size:14px;color:var(--signal)}
+  .row-item .step-n{font-family:var(--font-mono);font-size:13px;color:var(--accent);display:block;margin-bottom:6px}
+  .row-item .items{font-family:var(--font-mono);font-size:14.5px;color:var(--text);line-height:2}
+  .row-item .items span:not(:last-child)::after{content:", ";color:var(--text-dim)}
+
+  /* ---------- orchestration diagram ---------- */
+
+  .orchestra-wrap{padding:20px 0 40px}
+
+  .orchestra-note{margin-top:36px;padding-top:32px;border-top:1px solid var(--line-soft)}
+  .orchestra-note p{color:var(--text-dim);max-width:66ch;margin:0;font-size:16px}
+  .orchestra-note strong{color:var(--text);font-weight:600}
+
+  /* ---------- footer ---------- */
+
+  footer{border-top:1px solid var(--line-soft);padding:28px 0 40px;display:flex;justify-content:space-between;align-items:center;font-family:var(--font-mono);font-size:13px;color:var(--text-faint)}
+
+  /* ---------- responsive ---------- */
+
+  @media (max-width:820px){
+    .hero{grid-template-columns:1fr;gap:40px;padding-top:36px}
+    .hero-visual{order:-1}
+    .stats-grid{grid-template-columns:1fr 1fr;gap:28px 24px}
+    .section-head,.section-body,.row-item{grid-template-columns:1fr}
+    .section-head{gap:8px;margin-bottom:24px}
+    .section-body{gap:8px;margin-bottom:32px}
+    .section-tag{padding-top:0}
+    .row-item{gap:8px}
+    footer{flex-direction:column;gap:10px;align-items:flex-start}
+  }
+
+  @media (max-width:480px){
+    .wrap{padding:0 20px}
+    :root{--section-py:60px}
+    .cta-row{flex-direction:column;align-items:flex-start}
+    .stats-grid{grid-template-columns:1fr 1fr}
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
-<nav><div class="logo">Unit<span>AI</span></div><div>Local AI · Embedded · IoT</div></nav>
 
-<div class="hero">
-<div>
-<div class="badge">LOCAL AI · EMBEDDED · IOT</div>
-<h1>Building specialized AI agents for real-world systems.</h1>
-<p>UnitAI focuses on local LLM/SLM workflows, RAG, fine-tuning, MCP and intelligent embedded/IoT systems — turning generic AI into domain-specific tools.</p>
-<div class="btns">
-<a class="btn primary" href="https://github.com/ugurakas" target="_blank">GitHub</a>
-<a class="btn" href="https://www.linkedin.com/in/ugur-akas/" target="_blank">LinkedIn</a>
-</div>
-</div>
-<div class="box">
-$ unitai start<br><br>
-<span class="green">✓</span> Local model loaded<br>
-<span class="green">✓</span> RAG context connected<br>
-<span class="green">✓</span> MCP tools ready<br>
-<span class="green">✓</span> Agent workflow active<br><br>
-<span class="orange">goal:</span> build useful intelligence close to the real world_
-</div>
+  <nav class="top">
+    <div class="logo">Unit<em>AI</em></div>
+    <div class="navlinks">
+      <a href="#how">How it works</a>
+      <a href="#capabilities">Capabilities</a>
+      <a href="#stack">Stack</a>
+      <a href="#contact">Contact</a>
+      <a href="https://github.com/ugurakas" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div>
+      <h1>One system, orchestrating the expertise of a full engineering team.</h1>
+      <p class="lede">UnitAI runs a set of small, domain-specific language models side by side — reading camera input to detect and track objects, turning images into text, designing the hardware a sensor needs, and simulating device data to reconstruct what's missing. Each question is routed to the model built to answer it, so the result behaves like a single embedded systems engineer, not a general-purpose chatbot guessing at your datasheet.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="https://github.com/ugurakas" target="_blank" rel="noopener">View work on GitHub</a>
+        <a class="btn ghost" href="#how">See how it works</a>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <svg class="schematic hero-illustration" viewBox="0 0 380 660" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Illustration of a camera detecting and tracking an object, feeding a processor chip, a local AI model, and a simulation stage that reconstructs missing sensor data">
+
+        <!-- connecting traces -->
+        <path class="sch-trace" d="M150,150 V212" />
+        <path class="sch-trace-live" d="M150,338 V382" />
+        <path class="sch-trace" d="M150,478 V522" />
+
+        <!-- STAGE 1 — VISION: camera + detection + tracking -->
+        <rect class="sch-chip-rect" x="30" y="20" width="240" height="130" rx="10"/>
+        <circle cx="72" cy="85" r="22" fill="none" stroke="var(--line)" stroke-width="1.4"/>
+        <circle cx="72" cy="85" r="9" fill="var(--line-soft)"/>
+        <rect x="118" y="42" width="120" height="86" rx="4" fill="var(--bg)" stroke="var(--line)" stroke-width="1.2"/>
+        <rect x="132" y="58" width="34" height="42" rx="2" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+        <text x="149" y="53" text-anchor="middle" style="font-family:var(--font-mono);font-size:7px;fill:var(--accent)">0.94</text>
+        <rect x="182" y="70" width="34" height="42" rx="2" fill="none" stroke="var(--signal)" stroke-width="1.2" stroke-dasharray="3 3"/>
+        <circle cx="172" cy="88" r="1.4" fill="var(--signal)" opacity=".8"/>
+        <circle cx="178" cy="89" r="1.4" fill="var(--signal)" opacity=".8"/>
+        <text class="sch-label" x="150" y="167" text-anchor="middle">VISION</text>
+        <text class="sch-sublabel" x="150" y="181" text-anchor="middle">detect · track · image → text</text>
+
+        <!-- STAGE 2 — PROCESSOR: chip illustration with pins -->
+        <g>
+          <line x1="125" y1="222" x2="125" y2="212" stroke="var(--line)" stroke-width="1.4"/>
+          <line x1="150" y1="222" x2="150" y2="212" stroke="var(--line)" stroke-width="1.4"/>
+          <line x1="175" y1="222" x2="175" y2="212" stroke="var(--line)" stroke-width="1.4"/>
+          <line x1="125" y1="330" x2="125" y2="340" stroke="var(--line)" stroke-width="1.4"/>
+          <line x1="150" y1="330" x2="150" y2="340" stroke="var(--line)" stroke-width="1.4"/>
+          <line x1="175" y1="330" x2="175" y2="340" stroke="var(--line)" stroke-width="1.4"/>
+          <line x1="90" y1="248" x2="100" y2="248" stroke="var(--line)" stroke-width="1.4"/>
+          <line x1="90" y1="276" x2="100" y2="276" stroke="var(--line)" stroke-width="1.4"/>
+          <line x1="90" y1="304" x2="100" y2="304" stroke="var(--line)" stroke-width="1.4"/>
+          <line x1="200" y1="248" x2="210" y2="248" stroke="var(--line)" stroke-width="1.4"/>
+          <line x1="200" y1="276" x2="210" y2="276" stroke="var(--line)" stroke-width="1.4"/>
+          <line x1="200" y1="304" x2="210" y2="304" stroke="var(--line)" stroke-width="1.4"/>
+        </g>
+        <rect class="sch-chip-rect hi" x="100" y="222" width="100" height="108" rx="5"/>
+        <line x1="118" y1="240" x2="182" y2="240" stroke="var(--line-soft)" stroke-width=".8"/>
+        <line x1="118" y1="258" x2="182" y2="258" stroke="var(--line-soft)" stroke-width=".8"/>
+        <line x1="118" y1="276" x2="182" y2="276" stroke="var(--line-soft)" stroke-width=".8"/>
+        <line x1="118" y1="294" x2="182" y2="294" stroke="var(--line-soft)" stroke-width=".8"/>
+        <line x1="118" y1="312" x2="182" y2="312" stroke="var(--line-soft)" stroke-width=".8"/>
+        <line x1="136" y1="230" x2="136" y2="322" stroke="var(--line-soft)" stroke-width=".8"/>
+        <line x1="164" y1="230" x2="164" y2="322" stroke="var(--line-soft)" stroke-width=".8"/>
+        <text class="sch-label" x="150" y="352" text-anchor="middle">PROCESSOR</text>
+        <text class="sch-sublabel" x="150" y="366" text-anchor="middle">device design · STM32 · ESP32</text>
+
+        <!-- STAGE 3 — LOCAL MODEL: small neural net -->
+        <rect class="sch-chip-rect" x="60" y="382" width="180" height="96" rx="10"/>
+        <g stroke="var(--line-soft)" stroke-width=".8">
+          <line x1="90" y1="404" x2="150" y2="396"/>
+          <line x1="90" y1="404" x2="150" y2="420"/>
+          <line x1="90" y1="428" x2="150" y2="396"/>
+          <line x1="90" y1="428" x2="150" y2="420"/>
+          <line x1="90" y1="428" x2="150" y2="444"/>
+          <line x1="90" y1="452" x2="150" y2="420"/>
+          <line x1="90" y1="452" x2="150" y2="444"/>
+          <line x1="150" y1="396" x2="210" y2="410"/>
+          <line x1="150" y1="420" x2="210" y2="410"/>
+          <line x1="150" y1="420" x2="210" y2="434"/>
+          <line x1="150" y1="444" x2="210" y2="434"/>
+        </g>
+        <g fill="var(--signal)">
+          <circle cx="90" cy="404" r="3"/><circle cx="90" cy="428" r="3"/><circle cx="90" cy="452" r="3"/>
+          <circle cx="150" cy="396" r="3"/><circle cx="150" cy="420" r="3"/><circle cx="150" cy="444" r="3"/>
+          <circle cx="210" cy="410" r="3"/><circle cx="210" cy="434" r="3"/>
+        </g>
+        <text class="sch-label" x="150" y="500" text-anchor="middle">LOCAL MODEL</text>
+        <text class="sch-sublabel" x="150" y="514" text-anchor="middle">fine-tuned SLM · on-device</text>
+
+        <!-- STAGE 4 — SIMULATE & COMPLETE -->
+        <rect class="sch-chip-rect" x="45" y="522" width="210" height="100" rx="10"/>
+        <line x1="80" y1="565" x2="105" y2="565" stroke="var(--line)" stroke-width="1.3"/>
+        <line x1="105" y1="565" x2="130" y2="565" stroke="var(--signal)" stroke-width="1.3" stroke-dasharray="3 3"/>
+        <line x1="130" y1="565" x2="155" y2="565" stroke="var(--signal)" stroke-width="1.3" stroke-dasharray="3 3"/>
+        <line x1="155" y1="565" x2="180" y2="565" stroke="var(--signal)" stroke-width="1.3" stroke-dasharray="3 3"/>
+        <line x1="180" y1="565" x2="205" y2="565" stroke="var(--signal)" stroke-width="1.3" stroke-dasharray="3 3"/>
+        <line x1="205" y1="565" x2="230" y2="565" stroke="var(--line)" stroke-width="1.3"/>
+        <circle cx="80" cy="565" r="2.6" fill="var(--text-dim)"/>
+        <circle cx="105" cy="565" r="2.6" fill="var(--text-dim)"/>
+        <circle cx="130" cy="565" r="2.6" fill="none" stroke="var(--signal)" stroke-width="1.3"/>
+        <circle cx="155" cy="565" r="2.6" fill="var(--text-dim)"/>
+        <circle cx="180" cy="565" r="2.6" fill="none" stroke="var(--signal)" stroke-width="1.3"/>
+        <circle cx="205" cy="565" r="2.6" fill="var(--text-dim)"/>
+        <circle cx="230" cy="565" r="2.6" fill="var(--text-dim)"/>
+        <text class="sch-label" x="150" y="600" text-anchor="middle">SIMULATE &amp; COMPLETE</text>
+        <text class="sch-sublabel" x="150" y="613" text-anchor="middle">reconstructs missing data points</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stats-grid">
+      <div class="stat reveal reveal-row">
+        <div class="num">6</div>
+        <div class="label">specialist model roles orchestrated together</div>
+      </div>
+      <div class="stat reveal reveal-row">
+        <div class="num">100%</div>
+        <div class="label">inference stays on local hardware, no cloud round-trip</div>
+      </div>
+      <div class="stat reveal reveal-row">
+        <div class="num">1 GPU</div>
+        <div class="label">the entire pipeline runs on a single consumer GPU</div>
+      </div>
+      <div class="stat reveal reveal-row">
+        <div class="num">0</div>
+        <div class="label">generic answers — every response grounded in real source material</div>
+      </div>
+    </div>
+  </div>
+
+  <section id="how">
+    <div class="section-head reveal">
+      <div class="section-tag">how it works</div>
+      <h2>One engineer's worth of expertise, split across specialized models.</h2>
+    </div>
+    <div class="section-body reveal">
+      <div class="spacer"></div>
+      <p>A single general-purpose model has to be a little bit of everything, which means it's rarely precise about any of it. UnitAI takes the opposite approach: several small language models, each scoped to one part of the job, coordinated by an orchestrator that decides which model handles which part of a question and merges their answers into one response.</p>
+    </div>
+
+    <div class="orchestra-wrap reveal">
+      <svg class="schematic" viewBox="0 0 620 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram showing six specialized language models feeding into an orchestrator that produces one unified, engineer-level output">
+        <path class="sch-trace" d="M160,30 H190 V115 H250" />
+        <path class="sch-trace" d="M160,86 H210 V138 H250" />
+        <path class="sch-trace" d="M160,142 H190 V161 H250" />
+        <path class="sch-trace" d="M160,198 H210 V184 H250" />
+        <path class="sch-trace" d="M160,254 H190 V207 H250" />
+        <path class="sch-trace" d="M160,310 H210 V230 H250" />
+        <circle class="sch-via" cx="190" cy="30" r="3"/>
+        <circle class="sch-via" cx="210" cy="86" r="3"/>
+        <circle class="sch-via" cx="190" cy="142" r="3"/>
+        <circle class="sch-via" cx="210" cy="198" r="3"/>
+        <circle class="sch-via" cx="190" cy="254" r="3"/>
+        <circle class="sch-via" cx="210" cy="310" r="3"/>
+
+        <rect class="sch-chip-rect" x="10" y="9" width="150" height="42" rx="6"/>
+        <text class="sch-label" x="85" y="35" text-anchor="middle">HARDWARE</text>
+        <rect class="sch-chip-rect" x="10" y="65" width="150" height="42" rx="6"/>
+        <text class="sch-label" x="85" y="91" text-anchor="middle">FIRMWARE</text>
+        <rect class="sch-chip-rect" x="10" y="121" width="150" height="42" rx="6"/>
+        <text class="sch-label" x="85" y="147" text-anchor="middle">DEBUG</text>
+        <rect class="sch-chip-rect" x="10" y="177" width="150" height="42" rx="6"/>
+        <text class="sch-label" x="85" y="203" text-anchor="middle">DOCS</text>
+        <rect class="sch-chip-rect" x="10" y="233" width="150" height="42" rx="6"/>
+        <text class="sch-label" x="85" y="259" text-anchor="middle">VISION</text>
+        <rect class="sch-chip-rect" x="10" y="289" width="150" height="42" rx="6"/>
+        <text class="sch-label" x="85" y="315" text-anchor="middle">TEST / QA</text>
+
+        <rect class="sch-chip-rect hi" x="250" y="100" width="120" height="140" rx="6"/>
+        <text class="sch-label" x="310" y="166" text-anchor="middle">ORCHESTRATOR</text>
+        <text class="sch-sublabel" x="310" y="182" text-anchor="middle">routes · merges</text>
+
+        <path class="sch-trace-live2" d="M370,170 H440" />
+        <rect class="sch-chip-rect" x="440" y="100" width="170" height="140" rx="6"/>
+        <text class="sch-label" x="525" y="166" text-anchor="middle">UNIFIED OUTPUT</text>
+        <text class="sch-sublabel" x="525" y="182" text-anchor="middle">engineer-level answer</text>
+      </svg>
+    </div>
+
+    <div class="row-list">
+      <div class="row-item reveal reveal-row">
+        <div class="tag">hardware</div>
+        <p>Reads component datasheets, register maps, and pinouts, and answers hardware-level questions against the actual part — not a generic guess.</p>
+      </div>
+      <div class="row-item reveal reveal-row">
+        <div class="tag">firmware</div>
+        <p>Writes and reviews C/C++ firmware, RTOS tasks, and driver code grounded in the target platform's toolchain and constraints.</p>
+      </div>
+      <div class="row-item reveal reveal-row">
+        <div class="tag">debug</div>
+        <p>Works through logs, error codes, and signal timing to narrow down where and why a system is failing.</p>
+      </div>
+      <div class="row-item reveal reveal-row">
+        <div class="tag">docs</div>
+        <p>Turns finished work into documentation, changelogs, and handover notes a team can actually use later.</p>
+      </div>
+      <div class="row-item reveal reveal-row">
+        <div class="tag">vision</div>
+        <p>Runs object detection and image understanding for camera and sensor pipelines, tuned for on-device inference.</p>
+      </div>
+      <div class="row-item reveal reveal-row">
+        <div class="tag">test / qa</div>
+        <p>Generates test cases and sanity-checks generated code and answers before they reach the orchestrator's final output.</p>
+      </div>
+    </div>
+
+    <div class="orchestra-note reveal">
+      <p>The orchestrator routes each question to the model best equipped to answer it, then folds the results together — so the system responds like <strong>one engineer who happens to know everything</strong>, instead of six separate chatbots you have to manage yourself.</p>
+    </div>
+  </section>
+
+  <section id="process">
+    <div class="section-head reveal">
+      <div class="section-tag">process</div>
+      <h2>What happens between a question and an answer.</h2>
+    </div>
+
+    <div class="row-list">
+      <div class="row-item reveal reveal-row">
+        <div>
+          <span class="step-n">01 — ingest</span>
+          <h3>Take in the question and its context</h3>
+        </div>
+        <p>A question, log line, or code snippet comes in — along with whatever's attached: a datasheet, an error trace, a repo path.</p>
+      </div>
+      <div class="row-item reveal reveal-row">
+        <div>
+          <span class="step-n">02 — route</span>
+          <h3>Pick the right specialist</h3>
+        </div>
+        <p>The orchestrator classifies the request and hands it to the model (or models) built to answer that kind of question.</p>
+      </div>
+      <div class="row-item reveal reveal-row">
+        <div>
+          <span class="step-n">03 — retrieve</span>
+          <h3>Ground it in the real source</h3>
+        </div>
+        <p>RAG pulls the exact datasheet page, register definition, or code section the answer needs to be grounded in — not a memorized approximation.</p>
+      </div>
+      <div class="row-item reveal reveal-row">
+        <div>
+          <span class="step-n">04 — generate</span>
+          <h3>Draft the answer</h3>
+        </div>
+        <p>The specialist model produces a draft response, code change, or diagnosis using the retrieved context as its source of truth.</p>
+      </div>
+      <div class="row-item reveal reveal-row">
+        <div>
+          <span class="step-n">05 — verify & deliver</span>
+          <h3>Check it, then hand it back</h3>
+        </div>
+        <p>The orchestrator checks the draft against the original request and returns one coherent, engineer-level answer.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="focus">
+    <div class="section-head reveal">
+      <div class="section-tag">focus areas</div>
+      <h2>From firmware to local intelligence.</h2>
+    </div>
+
+    <div class="row-list">
+      <div class="row-item reveal reveal-row">
+        <h3>Local AI agents</h3>
+        <p>Agents built for one job and tuned to a narrow domain, running on hardware you control instead of a general-purpose chat interface in the cloud.</p>
+      </div>
+      <div class="row-item reveal reveal-row">
+        <h3>RAG and fine-tuning</h3>
+        <p>Retrieval-augmented context paired with targeted model adaptation, so answers stay grounded in your real documentation, datasheets, and code.</p>
+      </div>
+      <div class="row-item reveal reveal-row">
+        <h3>Embedded and IoT</h3>
+        <p>STM32, ESP32, and nRF52 firmware, RTOS scheduling, and the protocols that get a device talking to the world, from sensor to cloud and back.</p>
+      </div>
+      <div class="row-item reveal reveal-row">
+        <h3>Edge inference</h3>
+        <p>Object detection and local inference for situations where latency, privacy, or power budget rule out sending data to the cloud at all.</p>
+      </div>
+      <div class="row-item reveal reveal-row">
+        <h3>Dataset engineering</h3>
+        <p>Building fine-tuning datasets from real source code and documentation, using self-instruct generation to scale beyond hand-written examples.</p>
+      </div>
+      <div class="row-item reveal reveal-row">
+        <h3>Model deployment</h3>
+        <p>Quantization, GGUF conversion, and serving through llama.cpp — taking a trained model from checkpoint to a running local endpoint.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="capabilities">
+    <div class="section-head reveal">
+      <div class="section-tag">capabilities</div>
+      <h2>Everything the system is built to do.</h2>
+    </div>
+
+    <div class="row-list">
+      <div class="row-item reveal reveal-row">
+        <div class="tag">language &amp; code</div>
+        <div class="items">
+          <span>Firmware generation</span><span>code review &amp; refactoring</span><span>RTOS task design</span><span>protocol implementation</span><span>build &amp; toolchain troubleshooting</span><span>register-level driver code</span>
+        </div>
+      </div>
+      <div class="row-item reveal reveal-row">
+        <div class="tag">knowledge &amp; retrieval</div>
+        <div class="items">
+          <span>Datasheet &amp; register-map lookup</span><span>RAG over technical manuals</span><span>cross-referencing multiple documents</span><span>changelog &amp; handover writing</span><span>spec-to-summary translation</span>
+        </div>
+      </div>
+      <div class="row-item reveal reveal-row">
+        <div class="tag">debugging &amp; diagnostics</div>
+        <div class="items">
+          <span>Log &amp; trace analysis</span><span>error-code interpretation</span><span>signal timing review</span><span>root-cause narrowing</span><span>regression triage</span>
+        </div>
+      </div>
+      <div class="row-item reveal reveal-row">
+        <div class="tag">vision &amp; edge</div>
+        <div class="items">
+          <span>Object detection (YOLO)</span><span>on-device inference</span><span>camera &amp; sensor pipeline integration</span><span>model quantization for constrained hardware</span>
+        </div>
+      </div>
+      <div class="row-item reveal reveal-row">
+        <div class="tag">model engineering</div>
+        <div class="items">
+          <span>Dataset curation from source code</span><span>LoRA / QLoRA fine-tuning</span><span>GGUF conversion &amp; quantization</span><span>local deployment via llama.cpp</span><span>MCP tool orchestration</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="stack">
+    <div class="section-head reveal">
+      <div class="section-tag">stack</div>
+      <h2>Technologies in use.</h2>
+    </div>
+
+    <div class="row-list">
+      <div class="row-item reveal reveal-row">
+        <div class="tag">languages</div>
+        <div class="items"><span>C</span><span>C++</span><span>Python</span></div>
+      </div>
+      <div class="row-item reveal reveal-row">
+        <div class="tag">platforms</div>
+        <div class="items"><span>STM32</span><span>ESP32</span><span>nRF52</span></div>
+      </div>
+      <div class="row-item reveal reveal-row">
+        <div class="tag">firmware</div>
+        <div class="items"><span>FreeRTOS</span><span>Zephyr</span><span>Embedded Linux</span></div>
+      </div>
+      <div class="row-item reveal reveal-row">
+        <div class="tag">protocols</div>
+        <div class="items"><span>MQTT</span><span>TLS</span></div>
+      </div>
+      <div class="row-item reveal reveal-row">
+        <div class="tag">ai infrastructure</div>
+        <div class="items"><span>Local LLMs / SLMs</span><span>RAG</span><span>MCP</span><span>Fine-tuning</span><span>llama.cpp</span></div>
+      </div>
+      <div class="row-item reveal reveal-row">
+        <div class="tag">vision</div>
+        <div class="items"><span>YOLO</span><span>Edge inference</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="section-head reveal">
+      <div class="section-tag">contact</div>
+      <h2>Build, test, learn, iterate.</h2>
+    </div>
+
+    <div class="section-body">
+      <div class="spacer"></div>
+      <div class="contact-body reveal">
+        <p>Independent work on embedded systems, IoT, and local AI orchestration — based in Izmir, Turkey.</p>
+        <p style="margin-top:18px"><a class="contact-email" style="font-family:var(--font-mono);font-size:18px;color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-soft)" href="mailto:ugurakas@gmail.com">ugurakas@gmail.com</a></p>
+        <div style="display:flex;gap:22px;margin-top:22px">
+          <a style="font-size:15px;text-decoration:none;color:var(--text-dim);border-bottom:1px solid var(--line);padding-bottom:2px" href="https://github.com/ugurakas" target="_blank" rel="noopener">GitHub</a>
+          <a style="font-size:15px;text-decoration:none;color:var(--text-dim);border-bottom:1px solid var(--line);padding-bottom:2px" href="https://www.linkedin.com/in/ugur-akas/" target="_blank" rel="noopener">LinkedIn</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div>© 2026 UnitAI</div>
+    <div>Izmir, Turkey</div>
+  </footer>
+
 </div>
 
-<section>
-<div class="badge">CURRENT FOCUS</div>
-<h2>From firmware to local intelligence.</h2>
-<div class="cards">
-<div class="card"><div>🧠</div><h3>Local AI Agents</h3><p>Specialized local agents for specific domains and workflows.</p></div>
-<div class="card"><div>📚</div><h3>RAG & Fine-Tuning</h3><p>Context-aware systems using retrieval and targeted model adaptation.</p></div>
-<div class="card"><div>⚙️</div><h3>Embedded & IoT</h3><p>STM32, ESP32, nRF52, RTOS and device-to-cloud systems.</p></div>
-<div class="card"><div>👁️</div><h3>Edge AI</h3><p>YOLO and local inference where latency, privacy and efficiency matter.</p></div>
-</div>
-</section>
-
-<section>
-<div class="badge">STACK</div>
-<h2>Technologies</h2>
-<div class="tags">
-<span>C/C++</span><span>STM32</span><span>ESP32</span><span>nRF52</span><span>FreeRTOS</span><span>Zephyr</span><span>Embedded Linux</span><span>MQTT</span><span>TLS</span><span>YOLO</span><span>Local LLMs/SLMs</span><span>RAG</span><span>MCP</span><span>Fine-Tuning</span><span>llama.cpp</span>
-</div>
-</section>
-
-<section>
-<div class="badge">CONTACT</div>
-<h2>Build. Test. Learn. Iterate.</h2>
-<p>Independent work focused on embedded systems, IoT and local AI.</p>
-<p><a href="mailto:ugurakas@gmail.com" style="color:#ff7a00">ugurakas@gmail.com</a></p>
-</section>
-
-<footer>© 2026 UnitAI</footer>
-</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var els = document.querySelectorAll('.reveal');
+    if (reduced || !('IntersectionObserver' in window)) {
+      els.forEach(function (el) { el.classList.add('is-visible'); });
+      return;
+    }
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+    els.forEach(function (el) { obs.observe(el); });
+  });
+</script>
 </body>
 </html>
