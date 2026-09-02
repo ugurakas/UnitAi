@@ -7,9 +7,9 @@ import math
 # ==========================================
 class UnitAi-Config:
     def __init__(self):
-        self.vocab_size = 100352      # Kelime dağarcığı boyutu (Orijinal Phi-4 standardı)
+        self.vocab_size = 100352      # Kelime dağarcığı boyutu ( standart)
         self.hidden_size = 512        # Modelin anlamsal vektör genişliği (Örn: 256, 512, 1024, 5120)
-        self.num_layers = 6           # Üst üste binecek toplam derin katman sayısı (Örn: 4, 6, 12, 40)
+        self.num_layers = 40           # Üst üste binecek toplam derin katman sayısı (Örn: 4, 6, 12, 40)
         self.num_heads = 8            # Query (Soru) dikkat kafa sayısı (Hidden size'a tam bölünmelidir)
         self.num_kv_heads = 2         # Key-Value (Hafıza) kafa sayısı (GQA için num_heads'den küçük olmalı)
         self.intermediate_size = 1536 # MLP katmanının genişliği (Genelde hidden_size * 3 veya * 4 yapılır)
