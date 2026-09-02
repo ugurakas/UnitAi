@@ -4,7 +4,7 @@
 
 UnitAI orchestrates several small, domain-specific language models — one for hardware, one for firmware, one for debugging, one for vision — so the combined system responds like a full embedded systems engineer instead of a general-purpose chatbot.
 
-🔗 **[Live site](https://ugurakas.github.io/UnitAi/)**
+🔗 **[Live site](https://unitaitr.github.io/UnitAi/)**
 
 ---
 
