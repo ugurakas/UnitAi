@@ -178,6 +178,36 @@
     .cta-row{flex-direction:column;align-items:flex-start}
     .stats-grid{grid-template-columns:1fr 1fr}
   }
+
+  /* Agentic workflow examples */
+  .workflow-intro{display:flex;gap:16px;align-items:center;margin-bottom:24px;flex-wrap:wrap}
+  .workflow-badge{font:12px var(--font-mono);color:var(--signal);border:1px solid var(--signal);border-radius:30px;padding:5px 12px}
+  .workflow-intro p{margin:0;color:var(--text-dim);font-size:14px}
+  .workflow-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  .workflow-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:28px;min-width:0}
+  .workflow-card .workflow-number{font:13px var(--font-mono);color:var(--accent)}
+  .workflow-card h3{font:600 25px/1.25 var(--font-display);margin:18px 0 14px}
+  .workflow-card p{color:var(--text-dim);font-size:16px}
+  .workflow-outcome{border-left:2px solid var(--signal);padding-left:16px;margin:24px 0}
+  .workflow-outcome strong{display:block;color:var(--text);font-size:14px}
+  .workflow-outcome p{margin:6px 0}
+  .workflow-card summary{cursor:pointer;color:var(--accent);font-weight:500;padding:12px 0;min-height:44px}
+  .workflow-card summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+  .workflow-card ol{padding-left:24px;color:var(--text-dim);font-size:15px}
+  .workflow-card li{padding:8px 0 8px 5px}
+  .workflow-card li strong{display:block;color:var(--text)}
+  .workflow-example{background:var(--bg);border:1px solid var(--line);padding:16px;border-radius:6px;margin-top:18px}
+  .workflow-example span{font:11px var(--font-mono);color:var(--signal);text-transform:uppercase}
+  .workflow-example p{font-size:14px;margin:8px 0 0}
+  .workflow-boundary{font-size:14px!important;border-top:1px solid var(--line);padding-top:18px}
+  .workflow-footer{display:flex;justify-content:space-between;gap:24px;align-items:center;margin-top:26px}
+  .workflow-footer p{color:var(--text-dim);font-size:15px;max-width:64ch;margin:0}
+  nav.top{gap:24px;flex-wrap:wrap}
+  .navlinks{flex-wrap:wrap;gap:12px 20px}
+  section[id]{scroll-margin-top:24px}
+  @media(max-width:820px){.workflow-grid{grid-template-columns:1fr}.workflow-footer{align-items:flex-start;flex-direction:column}}
+  @media(max-width:480px){.workflow-card{padding:22px}.navlinks{font-size:14px}}
+
 </style>
 </head>
 <body>
@@ -187,6 +217,7 @@
     <div class="logo">Unit<em>AI</em></div>
     <div class="navlinks">
       <a href="#how">How it works</a>
+      <a href="#workflows">Agentic workflows</a>
       <a href="#capabilities">Capabilities</a>
       <a href="#stack">Stack</a>
       <a href="#contact">Contact</a>
@@ -200,7 +231,7 @@
       <p class="lede">UnitAI runs a set of small, domain-specific language models side by side — reading camera input to detect and track objects, turning images into text, designing the hardware a sensor needs, and simulating device data to reconstruct what's missing. Each question is routed to the model built to answer it, so the result behaves like a single embedded systems engineer, not a general-purpose chatbot guessing at your datasheet.</p>
       <div class="cta-row">
         <a class="btn primary" href="https://github.com/ugurakas" target="_blank" rel="noopener">View work on GitHub</a>
-        <a class="btn ghost" href="#how">See how it works</a>
+        <a class="btn ghost" href="#workflows">Explore automation examples</a>
       </div>
     </div>
 
@@ -315,6 +346,76 @@
       </div>
     </div>
   </div>
+
+
+  <section id="workflows" aria-labelledby="workflows-title">
+    <div class="section-head">
+      <div class="section-tag">agentic workflows</div>
+      <h2 id="workflows-title">How would you automate your work with AI agents?</h2>
+    </div>
+    <div class="section-body">
+      <div class="spacer"></div>
+      <p>Start with a real task. Give an agent the right context and tools, let it work through the steps, and review the result. These examples explore how local models could support work beyond the chat window.</p>
+    </div>
+    <div class="workflow-intro">
+      <span class="workflow-badge">CONCEPT EXAMPLES</span>
+      <p>Proposed workflows, not live services or validated products.</p>
+    </div>
+    <div class="workflow-grid">
+      <article class="workflow-card">
+        <span class="workflow-number">01 / LOCAL BUSINESS</span>
+        <h3>Find the right businesses. Start a relevant conversation.</h3>
+        <p>A local agent could turn a location, a service offering, and a target business category into a shortlist of potential customers or service partners, with a tailored outreach draft for each match.</p>
+        <div class="workflow-outcome">
+          <strong>What you get</strong>
+          <p>A sourced business shortlist, reasons for each match, and emails ready for review.</p>
+        </div>
+        <details>
+          <summary>Explore the workflow</summary>
+          <ol>
+            <li><strong>Define the search</strong>Choose an area, business category, and the product, advertising service, or support your company offers.</li>
+            <li><strong>Gather business context</strong>Use permitted Google Maps / Places integrations, public business websites, or a directory you provide. Keep source links and retrieval dates.</li>
+            <li><strong>Assess the fit locally</strong>A local model compares published business information with your offering, removes duplicates, and explains why each business may be relevant.</li>
+            <li><strong>Prepare useful outreach</strong>Draft a specific introduction using verified business context. You review the recipient and message before an authorized email integration sends it.</li>
+            <li><strong>Track the outcome</strong>Record approvals, replies, and opt-outs so follow-up work stays organized.</li>
+          </ol>
+          <div class="workflow-example">
+            <span>Illustrative brief</span>
+            <p>“Find businesses in Izmir that could benefit from our sensor-monitoring service. Show the evidence for each match and draft a short introduction.”</p>
+          </div>
+        </details>
+        <p class="workflow-boundary">Business discovery uses public listings, not people's private location or search histories. Model inference can stay local; map lookups and email delivery require external services.</p>
+      </article>
+      <article class="workflow-card">
+        <span class="workflow-number">02 / PREVENTIVE HEALTH</span>
+        <h3>Help care teams spot changes worth reviewing.</h3>
+        <p>A proposed workflow for preventive health and insurance wellness programs could organize a participant's consented health measurements and flag changes for clinical review.</p>
+        <div class="workflow-outcome">
+          <strong>What you get</strong>
+          <p>A trend summary, data-quality notes, and a review queue for the care team.</p>
+        </div>
+        <details>
+          <summary>Explore the workflow</summary>
+          <ol>
+            <li><strong>Collect with permission</strong>The participant chooses which wearable measurements, lab results, and health records to share, and with whom.</li>
+            <li><strong>Check the data</strong>Align dates and units, identify missing readings, and separate unreliable measurements from usable trends.</li>
+            <li><strong>Assess risk with a validated model</strong>A clinically validated model for the intended population would be needed to estimate specific risks. A language model can summarize the evidence and its limitations.</li>
+            <li><strong>Route to a clinician</strong>Present relevant trends, source measurements, and uncertainty for professional review before any care recommendation.</li>
+            <li><strong>Support follow-up</strong>After review, help organize agreed check-ins and reminders, with a record of who approved each action.</li>
+          </ol>
+          <div class="workflow-example">
+            <span>Illustrative output</span>
+            <p>“Some recent measurements differ from this participant's baseline. Several readings are missing. Review the source records before drawing a conclusion.”</p>
+          </div>
+        </details>
+        <p class="workflow-boundary">This concept does not diagnose disease or demonstrate predictive accuracy. It supports care review, not automated insurance eligibility or pricing decisions; clinical validation is required before real use.</p>
+      </article>
+    </div>
+    <div class="workflow-footer">
+      <p>The common pattern: gather context, plan the work, use the right tools, and make the result easy to review. Hardware and model choices depend on the workload.</p>
+      <a class="btn ghost" href="mailto:ugurakas@gmail.com?subject=UnitAI%20workflow%20idea">Discuss your workflow</a>
+    </div>
+  </section>
 
   <section id="how">
     <div class="section-head reveal">
