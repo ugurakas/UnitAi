@@ -355,11 +355,11 @@
     </div>
     <div class="section-body">
       <div class="spacer"></div>
-      <p>Start with a real task. Give an agent the right context and tools, let it work through the steps, and review the result. These examples explore how local models could support work beyond the chat window.</p>
+      <p>Start with a real task. Give an agent the right context and tools, let it work through the steps, and review the result. These concept examples explore how agents could support work beyond the chat window. They are not live UnitAI services. Open-source references are linked where a workflow draws on an existing project.</p>
     </div>
     <div class="workflow-intro">
       <span class="workflow-badge">CONCEPT EXAMPLES</span>
-      <p>Proposed workflows, not live services or validated products.</p>
+      <p>Six proposed workflows. Explore each example to see the steps and outputs.</p>
     </div>
     <div class="workflow-grid">
       <article class="workflow-card">
@@ -410,9 +410,41 @@
         </details>
         <p class="workflow-boundary">This concept does not diagnose disease or demonstrate predictive accuracy. It supports care review, not automated insurance eligibility or pricing decisions; clinical validation is required before real use.</p>
       </article>
+<article class="workflow-card">
+<span class="workflow-number">03 / RESEARCH</span><h3>Turn a broad question into a sourced brief.</h3><p>Explore a market, compare suppliers, or investigate a technical topic. A research agent could break the question into searches, follow evidence gaps, and assemble a brief you can check.</p>
+<div class="workflow-outcome"><strong>What you get</strong><p>A comparison brief with source links, open questions, and a clear recommendation to review.</p></div>
+<details><summary>Explore the workflow</summary><ol><li><strong>Set the question</strong>Define the decision, research scope, and sources you trust.</li><li><strong>Research in rounds</strong>Generate searches, read relevant pages, and follow up on missing or conflicting information.</li><li><strong>Build the brief</strong>Compare findings and keep citations next to the claims they support.</li><li><strong>Review the evidence</strong>Check source quality, dates, and unresolved questions before acting.</li></ol>
+<div class="workflow-example"><span>Illustrative brief</span><p>“Compare three sensor suppliers for an outdoor monitoring project. Include datasheets, integration constraints, and the questions we still need to ask.”</p></div></details>
+<p class="workflow-boundary">Local inference is possible with a compatible model; web research still connects to external sources.</p>
+<p style="font-size:14px">Pattern reference: <a href="https://github.com/langchain-ai/local-deep-researcher" target="_blank" rel="noopener">Local Deep Researcher</a></p>
+</article>
+<article class="workflow-card">
+<span class="workflow-number">04 / CUSTOMER SUPPORT</span><h3>Give every request the right next step.</h3><p>A support workflow could recognize the type of request, retrieve relevant policy or product information, and hand the conversation to the right specialist with its context intact.</p>
+<div class="workflow-outcome"><strong>What you get</strong><p>A grounded reply draft, relevant account context, and an escalation summary when needed.</p></div>
+<details><summary>Explore the workflow</summary><ol><li><strong>Understand the request</strong>Classify the issue and identify missing information.</li><li><strong>Retrieve the facts</strong>Read approved help documents and authorized account records.</li><li><strong>Route to a specialist</strong>Hand billing, technical, or order questions to the appropriate workflow.</li><li><strong>Resolve or escalate</strong>Prepare a reply; route exceptions and consequential account changes for review.</li></ol>
+<div class="workflow-example"><span>Illustrative brief</span><p>“Summarize this device setup issue, find the matching troubleshooting guide, and prepare a reply for the support team.”</p></div></details>
+<p class="workflow-boundary">This adapts a routing and handoff pattern. The reference demo uses hosted APIs; local deployment would need a compatible backend.</p>
+<p style="font-size:14px">Pattern reference: <a href="https://github.com/openai/openai-cs-agents-demo" target="_blank" rel="noopener">OpenAI customer service agents demo</a></p>
+</article>
+<article class="workflow-card">
+<span class="workflow-number">05 / SOFTWARE ENGINEERING</span><h3>Take an issue from bug report to reviewable fix.</h3><p>A coding agent could inspect a repository, reproduce a reported failure, propose a focused patch, and run relevant checks before handing the change to an engineer.</p>
+<div class="workflow-outcome"><strong>What you get</strong><p>A proposed code change, test results, and a concise explanation of what changed.</p></div>
+<details><summary>Explore the workflow</summary><ol><li><strong>Read the issue</strong>Inspect the relevant code, project instructions, and error logs.</li><li><strong>Reproduce and plan</strong>Confirm the failure in an isolated environment and identify the smallest useful change.</li><li><strong>Implement and check</strong>Edit the code and run appropriate tests, recording failures as well as passes.</li><li><strong>Prepare the handoff</strong>Package the diff and validation evidence for human review before merge or deployment.</li></ol>
+<div class="workflow-example"><span>Illustrative brief</span><p>“Investigate this failing firmware build, propose a fix, and show the checks that support it.”</p></div></details>
+<p class="workflow-boundary">Firmware workflows also need the correct toolchain and, where applicable, hardware testing. A passing software test does not establish hardware correctness.</p>
+<p style="font-size:14px">Pattern reference: <a href="https://github.com/OpenHands/OpenHands" target="_blank" rel="noopener">OpenHands</a></p>
+</article>
+<article class="workflow-card">
+<span class="workflow-number">06 / OPERATIONS</span><h3>Turn scattered files into a decision-ready report.</h3><p>A coordinated team of agents could read approved documents, reconcile spreadsheet information, research missing context, and prepare a weekly operations report.</p>
+<div class="workflow-outcome"><strong>What you get</strong><p>An exception list, a source-linked summary, and proposed follow-up tasks.</p></div>
+<details><summary>Explore the workflow</summary><ol><li><strong>Collect the inputs</strong>Select the reports, spreadsheets, and public sources the workflow may access.</li><li><strong>Divide the work</strong>Assign document reading, calculations, and research to suitable tools or specialists.</li><li><strong>Reconcile the results</strong>Check totals and conflicting records; mark missing inputs instead of inventing values.</li><li><strong>Prepare follow-up</strong>Create a report and action list for review before sharing or changing operational records.</li></ol>
+<div class="workflow-example"><span>Illustrative brief</span><p>“Compare this week's stock report with supplier updates and prepare a list of shortages for the operations meeting.”</p></div></details>
+<p class="workflow-boundary">An adaptation of a general multi-agent pattern, not a stock-management feature supplied by the reference project. Model and tool compatibility must be evaluated.</p>
+<p style="font-size:14px">Pattern reference: <a href="https://microsoft.github.io/autogen/dev/user-guide/agentchat-user-guide/magentic-one.html" target="_blank" rel="noopener">Microsoft Magentic-One</a></p>
+</article>
     </div>
     <div class="workflow-footer">
-      <p>The common pattern: gather context, plan the work, use the right tools, and make the result easy to review. Hardware and model choices depend on the workload.</p>
+      <p>The common pattern: gather context, plan the work, use the right tools, and make the result easy to review. References illustrate the patterns, not a UnitAI integration or endorsement. Local deployment depends on model, hardware, and tool compatibility.</p>
       <a class="btn ghost" href="mailto:ugurakas@gmail.com?subject=UnitAI%20workflow%20idea">Discuss your workflow</a>
     </div>
   </section>
